@@ -57,7 +57,7 @@ The CI/CD pipeline follows a webhook-driven, multi-node Jenkins architecture:
 
 2. **Install Required Software**
    - Follow the [Installation Guide](./docs/Installation.md) to install:
-     - Java (JRE 21)
+      - Java (JRE 21)
      - Jenkins (on Master)
      - Docker (on Agent)
      - Docker Compose (on Agent)
@@ -69,9 +69,11 @@ The CI/CD pipeline follows a webhook-driven, multi-node Jenkins architecture:
 4. **Configure Jenkins Pipeline**
    - Set up GitHub Webhook
    - Create Jenkins pipeline job
-   - Configure Docker Hub credentials
-   - Add environment variables
 
+5. **Configure the credentials and Env**
+    - Configure Docker Hub credentials
+    - Configure github reposetory credentials
+    - Add the Enviornment variables as the secret file 
 ---
 
 ## Project Structure
@@ -104,12 +106,5 @@ distributed-cicd-pipeline-jenkins-docker/
 
 ---
 
-## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
 
----
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
