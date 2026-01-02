@@ -1,0 +1,72 @@
+pipeline {
+    agent { label 'agent' }
+
+    stages {
+   
+        stage('Cloning the latest Repo') {
+            steps {
+                checkout scmGit(
+                    branches: [[name: '*/main']],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'git_id',
+                        url: 'https://github.com/laxmansingh-rajput/Gyan.git'
+                    ]]
+                )
+            }
+        }
+
+        stage('Injecting enviornment variables') {
+            steps {
+                withCredentials([file(credentialsId: 'backendEnv', variable: 'secretFile')]) {
+                    sh "cp  -f \$secretFile /home/ubuntu/workspace/newsVault/backend"
+                }
+
+                withCredentials([file(credentialsId: 'frontendEnv', variable: 'secretFile')]) {
+                    sh "cp -f \$secretFile /home/ubuntu/workspace/newsVault/"
+                }
+            }
+        }
+        stage('Build Docker Images') {
+            steps {
+                sh """
+                cd /home/ubuntu/workspace/newsVault/
+                docker-compose build
+                docker images
+                """
+            }
+        }
+        
+        stage('Store on Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub',
+                        usernameVariable: 'dockeruser',
+                        passwordVariable: 'dockerPass')]) {
+
+                    script {
+                        def version = env.BUILD_NUMBER   
+
+                        sh """
+                            docker login -u ${dockeruser} -p ${dockerPass}
+
+                            docker tag newsvault-frontend laxmansinghrajput/newsvaultfrontend-jenkins:${version}
+                            docker tag newsvault-backend  laxmansinghrajput/newsvaultbackend-jenkins:${version}
+
+                            docker push laxmansinghrajput/newsvaultfrontend-jenkins:${version}
+                            docker push laxmansinghrajput/newsvaultbackend-jenkins:${version}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploying') {
+            steps {
+                sh """
+                docker-compose up -d
+                """
+            }
+        }
+    }
+}
+
