@@ -21,7 +21,7 @@ The CI/CD pipeline follows a webhook-driven, multi-node Jenkins architecture:
 7. **NGINX** acts as a reverse proxy to route traffic based on domain names to specific application ports
 
 
-![Architecture Diagram](./assets/architecture.png)
+![Architecture Diagram](./assets/projectArchitecture.png)
 
 
 ---
