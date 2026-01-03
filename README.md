@@ -84,7 +84,7 @@ Follow the [SSH Connection Guide](./Docs/sshConnection.md) to establish SSH conn
 
 ### 6. Configure Jenkins Pipeline
 
-- Create a Jenkins pipeline job using the [Jenkinsfile](./Jenkins/jenkinsFile)
+- Create a Jenkins pipeline job using the [Jenkinsfile](./jenkins/jenkinsFile)
 - Set up GitHub Webhook in your repository settings
 
 ### 7. Configure NGINX
