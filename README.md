@@ -73,7 +73,7 @@ Follow the [SSH Connection Guide](./Docs/sshConnection.md) to establish SSH conn
 ### 4. Prepare Docker Files
 
 - Add [frontend Dockerfile](./Frontend/dockerfile) in the `frontend/` directory for the frontend application
-- Add [backend Dockerfile](./Backend/dockerfile) in the `backend/` directory for the backend application
+- Add [backend Dockerfile](./Backend/dockerFile) in the `backend/` directory for the backend application
 - Add [docker-compose.yaml](./dockercompose.yaml) file at the root of the repository
 
 ### 5. Configure Credentials and Environment Variables
@@ -84,7 +84,7 @@ Follow the [SSH Connection Guide](./Docs/sshConnection.md) to establish SSH conn
 
 ### 6. Configure Jenkins Pipeline
 
-- Create a Jenkins pipeline job using the [Jenkinsfile](./Jenkins/jenkinsFile)
+- Create a Jenkins pipeline job using the [Jenkinsfile](./Jenkins/jenkinsfile)
 - Set up GitHub Webhook in your repository settings
 
 ### 7. Configure NGINX
