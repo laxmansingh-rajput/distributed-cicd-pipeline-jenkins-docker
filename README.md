@@ -150,7 +150,6 @@ The Jenkins pipeline consists of the following stages:
 3. **Tag & Version** – Tags images with build number / version
 4. **Push** – Pushes Docker images to Docker Hub
 5. **Deploy** – Deploys containers using Docker Compose
-6. **Post Actions** – Cleans workspace and reports build status
 
 ---
 
