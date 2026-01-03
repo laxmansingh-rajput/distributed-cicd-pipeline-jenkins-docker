@@ -20,7 +20,9 @@ The CI/CD pipeline follows a webhook-driven, multi-node Jenkins architecture:
 6. **Docker Compose** deploys the containers on AWS EC2
 7. **NGINX** acts as a reverse proxy to route traffic based on domain names to specific application ports
 
+
 ![Architecture Diagram](./assets/architecture.png)
+
 
 ---
 
