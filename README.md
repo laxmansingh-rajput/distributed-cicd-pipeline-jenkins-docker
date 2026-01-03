@@ -58,7 +58,7 @@ Launch two EC2 instances (one for Master, one for Agent) and configure security 
 
 ### 2. Install Required Software
 
-Follow the [Installation Guide](./docs/Installation.md) to install:
+Follow the [Installation Guide](./Docs/Installation.md) to install:
 
 - Java (JRE 21)
 - Jenkins (on Master)
@@ -68,7 +68,7 @@ Follow the [Installation Guide](./docs/Installation.md) to install:
 
 ### 3. Connect Master and Agent
 
-Follow the [SSH Connection Guide](./docs/sshConnection.md) to establish SSH connectivity between Master and Agent nodes.
+Follow the [SSH Connection Guide](./Docs/sshConnection.md) to establish SSH connectivity between Master and Agent nodes.
 
 ### 4. Prepare Docker Files
 
