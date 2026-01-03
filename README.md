@@ -38,42 +38,77 @@ The CI/CD pipeline follows a webhook-driven, multi-node Jenkins architecture:
 
 ---
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - AWS Account with EC2 access
 - Docker Hub account
 - GitHub repository
 - Domain name (optional, for NGINX configuration)
 
-### Setup Steps
+---
 
-1. **Create AWS EC2 Instances**
-   - Launch two EC2 instances (one for Master, one for Agent)
-   - Configure security groups to allow necessary ports:
-     - Jenkins Master: 8080 (Jenkins UI), 22 (SSH)
-     - Jenkins Agent: 22 (SSH), 80 (HTTP), 443 (HTTPS)
+## Getting Started
 
-2. **Install Required Software**
-   - Follow the [Installation Guide](./docs/Installation.md) to install:
-      - Java (JRE 21)
-     - Jenkins (on Master)
-     - Docker (on Agent)
-     - Docker Compose (on Agent)
-     - NGINX (on Agent)
+### 1. Create AWS EC2 Instances
 
-3. **Connect Master and Agent**
-   - Follow the [SSH Connection Guide](./docs/sshConnection.md) to establish SSH connectivity between Master and Agent nodes
+Launch two EC2 instances (one for Master, one for Agent) and configure security groups to allow necessary ports:
 
-4. **Configure Jenkins Pipeline**
-   - Set up GitHub Webhook
-   - Create Jenkins pipeline job
+- **Jenkins Master:** 8080 (Jenkins UI), 22 (SSH)
+- **Jenkins Agent:** 22 (SSH), 80 (HTTP), 443 (HTTPS)
 
-5. **Configure the credentials and Env**
-    - Configure Docker Hub credentials
-    - Configure github reposetory credentials
-    - Add the Enviornment variables as the secret file 
+### 2. Install Required Software
+
+Follow the [Installation Guide](./docs/Installation.md) to install:
+
+- Java (JRE 21)
+- Jenkins (on Master)
+- Docker (on Agent)
+- Docker Compose (on Agent)
+- NGINX (on Agent)
+
+### 3. Connect Master and Agent
+
+Follow the [SSH Connection Guide](./docs/sshConnection.md) to establish SSH connectivity between Master and Agent nodes.
+
+### 4. Prepare Docker Files
+
+- Add [frontend Dockerfile](./Frontend/dockerfile) in the `frontend/` directory for the frontend application
+- Add [backend Dockerfile](./Backend/dockerfile) in the `backend/` directory for the backend application
+- Add [docker-compose.yaml](./dockercompose.yaml) file at the root of the repository
+
+### 5. Configure Credentials and Environment Variables
+
+- Configure Docker Hub credentials in Jenkins
+- Configure GitHub repository credentials in Jenkins
+- Add the environment variables as a secret file in Jenkins
+
+### 6. Configure Jenkins Pipeline
+
+- Create a Jenkins pipeline job using the [Jenkinsfile](./Jenkins/jenkinsFile)
+- Set up GitHub Webhook in your repository settings
+
+### 7. Configure NGINX
+
+Add NGINX configuration files:
+
+```bash
+# Add frontend configuration
+sudo cp Nginx/frontend.conf /etc/nginx/sites-available/
+
+# Add backend configuration
+sudo cp Nginx/backend.conf /etc/nginx/sites-available/
+
+# Create soft links to sites-enabled
+sudo ln -s /etc/nginx/sites-available/frontend.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/backend.conf /etc/nginx/sites-enabled/
+
+# Test NGINX configuration
+sudo nginx -t
+
+# Restart NGINX
+sudo systemctl restart nginx
+```
+
 ---
 
 ## Project Structure
@@ -86,11 +121,58 @@ distributed-cicd-pipeline-jenkins-docker/
 │   ├── Installation.md
 │   └── sshConnection.md
 ├── frontend/
+│   ├── Dockerfile          # Frontend container configuration
+│   ├── .dockerignore       # Files to exclude from Docker build
+│   └── ...                 # Frontend application files
 ├── backend/
-├── docker-compose.yml
-├── Jenkinsfile
+│   ├── Dockerfile          # Backend container configuration
+│   ├── .dockerignore       # Files to exclude from Docker build
+│   └── ...                 # Backend application files
+├── Nginx/
+│   ├── frontend.conf       # NGINX frontend configuration
+│   └── backend.conf        # NGINX backend configuration
+├── Jenkins/
+│   └── jenkinsFile         # Jenkins pipeline configuration
+├── docker-compose.yml      # Multi-container orchestration file
 └── README.md
 ```
+
+---
+
+## Jenkins Pipeline Stages
+
+The Jenkins pipeline consists of the following stages:
+
+1. **Checkout** – Clones the latest code from GitHub
+2. **Build** – Builds Docker images for frontend and backend
+3. **Tag & Version** – Tags images with build number / version
+4. **Push** – Pushes Docker images to Docker Hub
+5. **Deploy** – Deploys containers using Docker Compose
+6. **Post Actions** – Cleans workspace and reports build status
+
+---
+
+## Workflow
+
+1. Developer pushes code to GitHub repository
+2. GitHub webhook notifies Jenkins Master
+3. Jenkins Master delegates the job to Jenkins Agent
+4. Agent pulls the latest code from GitHub
+5. Docker images are built from Dockerfiles in `frontend/` and `backend/` directories
+6. Images are tagged with version numbers and pushed to Docker Hub
+7. Docker Compose pulls the images and deploys containers on EC2
+8. NGINX routes traffic to the appropriate services based on domain configuration
+
+---
+
+## Ports & Access
+
+| Service | Port | Access |
+|---------|------|--------|
+| Jenkins UI | 8080 | Public (Web Interface) |
+| Frontend | 80 / 443 | Public (via NGINX) |
+| Backend | Internal | Private (via NGINX Proxy) |
+| SSH | 22 | Restricted (Key-based) |
 
 ---
 
@@ -106,5 +188,25 @@ distributed-cicd-pipeline-jenkins-docker/
 
 ---
 
+## Troubleshooting
 
+**Jenkins Agent Connection Issues**
+- Verify SSH connectivity between Master and Agent
+- Check agent logs in Jenkins UI
+- Ensure Java is installed on the agent
 
+**Docker Build Failures**
+- Ensure Dockerfiles are properly configured in respective directories
+- Verify Docker daemon is running on the agent
+- Check Docker Hub credentials in Jenkins
+- Check the path of the frontend and backend dockerfile in the docker-compose.yaml
+
+**NGINX Errors**
+- Run `sudo nginx -t` to validate configuration syntax
+- Check NGINX error logs: `sudo tail -f /var/log/nginx/error.log`
+- Ensure domain DNS is properly configured
+
+**Port Conflicts**
+- Verify security group rules in AWS EC2
+
+---
